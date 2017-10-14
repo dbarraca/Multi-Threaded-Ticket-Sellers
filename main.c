@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include "customer.h"
+
+#define ROWS 10
+#define COLS 10
+#define SELLERS 10
+#define SELL_TYPE 3
 
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -30,13 +36,20 @@ void wakeup_all_seller_threads() {
    pthread_mutex_unlock(&mutex);
 }
 
-int main() {
-   int i;
-   pthread_t tids[10];
-   char seller_type[3] = {'H', 'M', 'L'};
+int main(int argc, char *argv[]) {
+   int i, custPerSeller = strtoul(argv[1], NULL, 0);
+   pthread_t tids[SELLERS];
+   char seller_type[SELL_TYPE] = {'H', 'M', 'L'};
    // Create necessary data structures for the simulator.
+   // seat seats[ROWS][COLS] = init_seats();
    // Create buyers list for each seller ticket queue based on the
    // N value within an hour and have them in the seller queue.
+
+//   printf("N = %i\n", strtoul(argv[1], NULL, 0));
+//   Customer custQueues[SELLERS][sellersCustomers] =
+//    createCustQueue(SELLERS, sellersCustomers);
+   Customer **custQueues =
+    createCustQueues(SELLERS, custPerSeller);
 
    // Create 10 threads representing the 10 sellers.
    pthread_create(&tids[0], NULL, (void *)sell, &seller_type[0]);
@@ -55,6 +68,10 @@ int main() {
       pthread_join(tids[i], NULL);
 
    // Printout simulation results
+
+
+
+   freeCustQueues(custQueues, SELLERS, custPerSeller);
 
    exit(0);
 }
