@@ -8,6 +8,19 @@
 #define M_MAX 3
 #define L_MAX 4
 
+int compareArrive(const void *custA, const void *custB) {
+   int ret = 0;
+
+   if (((Customer *) custA)->arrive > ((Customer *) custB)->arrive) {
+      ret = 1;
+   }
+   else if (((Customer *) custA)->arrive < ((Customer *) custB)->arrive) {
+      ret = -1;
+   }
+
+    return ret;
+}
+
 Customer createCustomer(char sellerType) {
    Customer customer;
 
@@ -30,6 +43,8 @@ Customer *createCustQueue(int queueLength, char sellerType) {
    int custIndex;
    Customer *custQueue = malloc(sizeof(Customer) * queueLength);
 
+   printf("\n");
+
    for (custIndex = 0; custIndex < queueLength; custIndex++)
       custQueue[custIndex] = createCustomer(sellerType);
 
@@ -51,6 +66,9 @@ Customer **createCustQueues(int numQueues, int queueLength) {
 
    for (qIndex = 4; qIndex < 10; qIndex++)
       custQueues[qIndex] = createCustQueue(queueLength, 'L');
+
+   for (qIndex = 0; qIndex < numQueues; qIndex++)
+      qsort(custQueues[qIndex], queueLength, sizeof(Customer), compareArrive);
 
    return custQueues;
 }
