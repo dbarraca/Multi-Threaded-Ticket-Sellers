@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <pthread.h>
 #include "customer.h"
+#include "seller.h"
 
 #define ROWS 10
 #define COLS 10
-#define SELLERS 10
-#define SELL_TYPE 3
+
 
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -14,7 +14,7 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 // seller thread to serve one time slice (1 minute)
 void * sell(char *seller_type) {
 
-   printf("sell called for %c\n", *seller_type);
+   //printf("sell called for %c\n", *seller_type);
 /*   While (having more work todo) {
       pthread_mutex_lock(&mutex);
    // atomically release mutex and wait on cond until somebody does signal or broadcast.
@@ -51,6 +51,8 @@ int main(int argc, char *argv[]) {
    Customer **custQueues =
     createCustQueues(SELLERS, custPerSeller);
 
+   printCustQueues(custQueues, custPerSeller);
+
    // Create 10 threads representing the 10 sellers.
    pthread_create(&tids[0], NULL, (void *)sell, &seller_type[0]);
 
@@ -68,8 +70,6 @@ int main(int argc, char *argv[]) {
       pthread_join(tids[i], NULL);
 
    // Printout simulation results
-
-
 
    freeCustQueues(custQueues, SELLERS, custPerSeller);
 

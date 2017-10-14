@@ -10,3 +10,5 @@ typedef struct Customer{
 Customer **createCustQueues(int numQueues, int queueLength);
 
 void freeCustQueues(Customer **custQueues, int numQueues, int queueLength);
+
+void printCustQueues(Customer **custQueues, int queueLength);
