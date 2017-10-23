@@ -18,13 +18,10 @@ Buyer ***buyQueues; // array of queues of buyers
 char ***seats; // seats for sellers to sell and buyers to purchase
 Seller **sellers;
 
-// array holding places of each seller in their respective queues
-//int qIndex[SELLERS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 // signals the current thread is done selling in the current minute
 void doneSelling() {
    // sleep process to help with timing between thread wake ups
-   //sleep(1);
    usleep(100000);
 
    pthread_mutex_lock(&mutex);
@@ -37,6 +34,7 @@ void doneSelling() {
       // set number of current sellers to default value
       selling = SELLERS;
    }
+
    //signal another thread to sell
    pthread_cond_signal(&cond);
    pthread_mutex_unlock(&mutex);
@@ -221,6 +219,8 @@ int main(int argc, char *argv[]) {
    // Printout simulation results
    // print of sellers of seats
    printSeats(seats, ROWS, COLS);
+   countSeats(seats, ROWS, COLS);
+
 
    fflush(stdout);
 
