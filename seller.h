@@ -7,12 +7,13 @@
 #define SELL_TYPE 3
 
 typedef struct Seller{
-   char * name;
-   int qIndex;
-   int *order;
-   int currRowIndex;
-   int currCol;
-   int seatCount;
+   char * name; // name of seller
+   int qIndex; // index of seller in queue
+   int arrivedIndex; // index of last arrived customer in queue
+   int *order; // order of rows seller should assign seats
+   int currRowIndex; // index in order variable holding current row to assign seats
+   int currCol; // current column to assign a seat
+   int seatCount; // number of seat seller has assigned.
 } Seller;
 
 

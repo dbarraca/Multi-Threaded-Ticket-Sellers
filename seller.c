@@ -30,6 +30,7 @@ Seller *createSeller(int index) {
    }
 
    seller->qIndex = 0;
+   seller->arrivedIndex = 0;
    seller->currRowIndex = 0;
    seller->currCol = 0;
    seller->seatCount = 0;
