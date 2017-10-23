@@ -4,12 +4,10 @@
 #define ROWS 10
 #define COLS 10
 
-/*
-typedef struct Seat{
-   int seller;
-} Seat;
-*/
-
 char ***createSeats(int row, int cols);
+
+void printSeats(char ***seats, int rows, int cols);
+
+void freeSeats(char ***seats, int rows, int cols);
 
 #endif

@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <pthread.h>
 
@@ -14,7 +15,8 @@ int min; // current time in minutes
 int selling; // number of sellers making a transaction in the current minute
 int buyPerSeller; // Buyers per Seller
 Buyer ***buyQueues; // array of queues of buyers
-char *seats[ROWS][COLS]; // seats for sellers to sell and buyers to purchase
+char ***seats; // seats for sellers to sell and buyers to purchase
+Seller **sellers;
 
 // array holding places of each seller in their respective queues
 int qIndex[SELLERS] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -30,58 +32,103 @@ void mutexWait() {
 // signals the current thread is done selling in the current minute
 void doneSelling() {
    // sleep process to help with timing between thread wake ups
-   sleep(1);
-//   usleep(1000000);
+   //sleep(1);
+   usleep(100000);
 
    pthread_mutex_lock(&mutex);
 
    // decrement the number of sellers making a transaction in the current minute
    selling--;
-
+   if (selling <= 0) {
+      // move to a next minute
+     // printf("min %i\n", min);
+      min++;
+      // set number of current sellers to default value
+      selling = SELLERS;
+   }
    //signal another thread to sell
    pthread_cond_signal(&cond);
    pthread_mutex_unlock(&mutex);
 }
 
-// reset the number of sellers making a transaction in the current minute
-// to number of total sellers at start on new minute
-void resetSelling() {
-   pthread_mutex_lock(&mutex);
-
-   // the number of current sellers
-   if (selling <= 0) {
-      // move to a next minute
-      min++;
-      // set number of current sellers to default value
-      selling = SELLERS;
-   }
-   pthread_mutex_unlock(&mutex);
+void printTime() {
+   if (min < 10)
+      printf("0:0%i ", min);
+   else
+      printf("0:%i ", min);
 }
 
-// seller thread to serve one time slice (1 minute)
+char * intToStr(int toConvert) {
+   char *retStr = malloc(sizeof(char) * 3);
+
+   retStr[0] = '0' + toConvert / 10;
+   retStr [1] = '0' + toConvert % 10;
+   retStr [2] = '\0';
+
+   return retStr;
+}
+
+void assignSeat(int sellerIndex) {
+   Seller *seller = sellers[sellerIndex];
+
+   while (seller->currRowIndex < ROWS &&
+    seats[seller->order[seller->currRowIndex]][seller->currCol] != NULL) {
+      seller->currCol++;
+
+      if (seller->currCol >= COLS) {
+         seller->currCol = 0;
+         seller->currRowIndex++;
+      }
+   }
+
+   if (seller->currRowIndex < ROWS &&
+    seats[seller->order[seller->currRowIndex]][seller->currCol] == NULL) {
+      seller->seatCount++;
+
+      seats[seller->order[seller->currRowIndex]][seller->currCol] = malloc(sizeof(char *));
+      strcpy(seats[seller->order[seller->currRowIndex]][seller->currCol], seller->name);
+
+      char *seatCount = intToStr(seller->seatCount);
+
+      strcat(seats[seller->order[seller->currRowIndex]][seller->currCol],
+       seatCount);
+
+      printTime();
+      printf("Seller %s assigned their customer %i to a seat in row %i column %i\n",
+       seller->name, qIndex[sellerIndex] + 1, seller->order[seller->currRowIndex], seller->currCol);
+
+      free(seatCount);
+   }
+}
+
+// seller thread to serve one hour
 void * sell(int *sellerIndex) {
-//   int qIndex[SELLERS] = {};
+   Buyer *currBuyer = buyQueues[*sellerIndex][qIndex[*sellerIndex]];
 
    // count the minutes until 1 hour of selling
    while (min < 60) {
 
       pthread_mutex_lock(&mutex);
-      while (qIndex[*sellerIndex] < buyPerSeller &&
-       buyQueues[*sellerIndex][qIndex[*sellerIndex]]->arrive == min) {
-
-         printf("arrived %i min %i seller  %i\n",
-          buyQueues[*sellerIndex][qIndex[*sellerIndex]]->arrive, min, *sellerIndex);
+      if (qIndex[*sellerIndex] < buyPerSeller &&
+       currBuyer->arrive <= min) {
+         if (currBuyer->currSale == 0) {
+            // assign a seat for new buyer
+            assignSeat(*sellerIndex);
+         }
 
          pthread_cond_wait(&cond, &mutex);
 
-         // move to next buyer in queue of this thread
-         qIndex[*sellerIndex]++;
+         currBuyer->currSale++;
+
+         if (currBuyer->currSale >= currBuyer->totSale) {
+            // move to next buyer in queue of this thread
+            qIndex[*sellerIndex]++;
+            currBuyer = buyQueues[*sellerIndex][qIndex[*sellerIndex]];
+         }
       }
       pthread_mutex_unlock(&mutex);
 
       doneSelling();
-
-      resetSelling();
    }
 
    pthread_exit(0);
@@ -109,7 +156,8 @@ int main(int argc, char *argv[]) {
    buyPerSeller = strtoul(argv[1], NULL, 0);
 
    // Create necessary data structures for the simulator.
-  // seats = createSeats(ROWS, COLS);
+   seats = createSeats(ROWS, COLS);
+   sellers = createSellers(SELLERS);
 
    // Create buyers list for each seller ticket queue based on the
    // N value within an hour and have them in the sorted seller queue.
@@ -128,12 +176,20 @@ int main(int argc, char *argv[]) {
    for (i = 0 ; i < SELLERS ; i++)
       pthread_join(tids[i], NULL);
 
-   // Printout simulation results
    //printBuyQueues(buyQueues, buyPerSeller);
-   fflush(stdout);
 
-   //free buyers and data structures holding them
+   // Printout simulation results
+   // print of sellers of seats
+   printSeats(seats, ROWS, COLS);
+   //free seats and data structures holding them
+   fflush(stdout);
+   freeSeats(seats, ROWS, COLS);
+
+   // free buyers and data structures holding them
    freeBuyQueues(buyQueues, SELLERS, buyPerSeller);
+
+   // free seller and other allocated variables
+   freeSellers(sellers, SELLERS);
 
    pthread_mutex_destroy(&mutex);
    pthread_cond_destroy(&cond);

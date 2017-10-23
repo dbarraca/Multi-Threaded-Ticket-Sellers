@@ -3,8 +3,8 @@
 
 typedef struct Buyer{
    int arrive; //arrival time
-   int sale; // sale time
-   int passed; // sale time that has passed
+   int totSale; // sale time
+   int currSale; // sale time that has passed
 } Buyer;
 
 

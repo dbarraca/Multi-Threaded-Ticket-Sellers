@@ -28,13 +28,13 @@ Buyer *createBuyer(char sellerType) {
    buyer->arrive = rand() % MIN; // set arrival time
 
    if (sellerType == 'H')
-      buyer->sale = (rand() % H_MAX) + 1;
+      buyer->totSale = (rand() % H_MAX) + 1;
    else if (sellerType == 'M')
-      buyer->sale = (rand() % M_MAX) + 2;
+      buyer->totSale = (rand() % M_MAX) + 2;
    else if (sellerType == 'L')
-      buyer->sale = (rand() % L_MAX) + 4;
+      buyer->totSale = (rand() % L_MAX) + 4;
 
-   buyer->passed = 0; // set arrival time
+   buyer->currSale = 0; // set arrival time
 
    return buyer;
 }
@@ -52,7 +52,6 @@ Buyer **createBuyQueue(int queueLength, char sellerType) {
 Buyer ***createBuyQueues(int numQueues, int queueLength) {
    int qIndex;
    Buyer ***buyQueues = malloc(sizeof(Buyer **) * numQueues);
-   printf("numQueues %i, queueLength %i\n", numQueues, queueLength);
 
    srand(0);
 
@@ -89,7 +88,7 @@ void printBuyQueue(Buyer **buyQueue, int queueLength) {
 
    for (buyIndex = 0; buyIndex < queueLength; buyIndex++) {
       currBuy = buyQueue[buyIndex];
-      printf("arrive: %i sale: %i\n", currBuy->arrive, currBuy->sale);
+      printf("arrive: %i sale: %i\n", currBuy->arrive, currBuy->totSale);
    }
 }
 
