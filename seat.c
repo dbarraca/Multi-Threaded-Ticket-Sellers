@@ -24,6 +24,8 @@ char ***createSeats(int rows, int cols) {
 void printSeats(char ***seats, int rows, int cols) {
    int currRow, currCol;
 
+   printf("\n");
+
    // iterate through each row of seats
    for (currRow = 0; currRow < rows; currRow++) {
       // iterate through each column of seats
@@ -44,6 +46,8 @@ void printSeats(char ***seats, int rows, int cols) {
 
 void countSeats(char ***seats, int rows, int cols) {
    int currRow, currCol, HCount = 0, MCount = 0, LCount = 0;
+
+   printf("\n");
 
    // iterate through each rows of seats
    for (currRow = 0; currRow < rows; currRow++) {
