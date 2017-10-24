@@ -17,10 +17,34 @@
  */
 char ***createSeats(int rows, int cols);
 
+/**
+ * Prints the seating chart. Buyers are identified the seller who sold the seat
+ * the number of tickets sold by the seller at the time of the seat being
+ * assigned.
+ *
+ * seats: pointer to two dimensional array of seats
+ * rows: number of rows of seats
+ * cols: number of columns of seats
+ */
 void printSeats(char ***seats, int rows, int cols);
 
+/**
+ * Counts and prints the number of tickets for each price level.
+ *
+ * seats: pointer to two dimensional array of seats
+ * rows: number of rows of seats
+ * cols: number of columns of seats
+ */
 void countSeats(char ***seats, int rows, int cols);
 
+/**
+ * Frees the two dimensional array holding the seats and each pointer to the
+ * rows of seats.
+
+ * seats: pointer to two dimensional array of seats
+ * rows: number of rows of seats
+ * cols: number of columns of seats
+ */
 void freeSeats(char ***seats, int rows, int cols);
 
 #endif

@@ -71,7 +71,7 @@ void freeBuyQueues(Buyer ***buyQueues, int numQueues, int queueLength);
  * buyQueue: pointer to queue of buyers
  * queueLength: number of buyers in each queue
  */
-void printBuyQueue(Buyer **buyQueue, int queueLength)
+void printBuyQueue(Buyer **buyQueue, int queueLength);
 
 /**
  * Prints a single queue of buyers with each buyer's arrival time and total sale time
